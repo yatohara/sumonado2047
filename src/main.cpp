@@ -17,9 +17,11 @@ Motors motors;
 bool running = false;
 unsigned long startTime = 0;
 bool direcao = false;
+int right_line, left_line;
+
 
 void line_sensor_setup();
-int detectalinha(int sensor_pin);
+int detectaLinha(int sensor_pin);
 
 void setup() {
   Serial.begin(9600);
@@ -56,6 +58,17 @@ void readControl() {
 }
 
 void loop(){
+
+    right_line = detectaLinha(right_line_sensor);
+    left_line = detectaLinha(left_line_sensor);
+
+
+    Serial.print("Direita: ");
+    Serial.print(right_line);
+    Serial.print("  Esquerda: "); 
+    Serial.print(left_line);
+    Serial.println(" ");
+
     if (running) {
         unsigned long relativeTime = millis() - startTime;
         Serial.println(sensor.readRangeContinuousMillimeters());

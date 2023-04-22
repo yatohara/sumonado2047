@@ -10,17 +10,11 @@ Motors motors;
 
 #define ledTeste 4
 #define IR_RECEIVE_PIN 36
-#define right_line_sensor 23
-#define left_line_sensor 15
-
 
 bool running = false;
 unsigned long startTime = 0;
 bool direcao = false;
-
 void line_sensor_setup();
-int detectalinha(int sensor_pin);
-
 void setup() {
   Serial.begin(9600);
   Wire.begin();
@@ -32,7 +26,6 @@ void setup() {
   }
   sensor.startContinuous();
   motors.setup();
-  line_sensor_setup();
 
   pinMode(ledTeste, OUTPUT);
   digitalWrite(ledTeste, LOW);
@@ -87,12 +80,4 @@ void loop(){
     }
 
     readControl();
-}
-void line_sensor_setup(){
-    pinMode(right_line_sensor, INPUT);
-    pinMode(left_line_sensor, INPUT);
-}
-
-int detectaLinha(int sensor_pin){
-    return digitalRead(sensor_pin);
 }

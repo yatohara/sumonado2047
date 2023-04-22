@@ -14,7 +14,7 @@ double sensor_front, sensor_right, sensor_left;
 int line_right, line_left;
 int ajuste; 
 long rotate_start_time = 0;
-int c = 0;
+long global_time = 0, rtime;
 int comando;
 
 
@@ -25,16 +25,17 @@ void setup(){
   Serial.begin(SERIAL_RATE);
   Wire.begin(SDA, SCL);
   IrReceiver.begin(IRRECEPTOR);
+
+  global_time = millis();
   pinMode(LED_TESTE, OUTPUT);
   digitalWrite(LED_TESTE, LOW);
   setup_sensor();
   setup_motor();
-  //setup_drv();
   }
 
 // para teste do código
 void loop(){
-
+  rtime = millis();
 
   if (IrReceiver.decode()){
     IrReceiver.resume();
@@ -49,16 +50,15 @@ void loop(){
   }
 
   else if (comando == IR_BUTTON2){
-    c = 0;
+    Serial.println("START");
     pisca_pisca();
-    sensor_front = read_front_sensor();
-    sensor_right = read_right_sensor();
-    sensor_left = read_left_sensor();
-    // line_right = read_sensor_lin(right_line_sensor);
-    // line_left = read_sensor_lin(left_line_sensor); 
-    line_right = 1;
-    line_left = 1;
-    int ajuste = ajuste_sumonado(sensor_left, sensor_right, sensor_front);
+    // sensor_front = read_front_sensor();
+    // sensor_right = read_right_sensor();
+    // sensor_left = read_left_sensor();
+    line_right = read_sensor_lin(right_line_sensor);
+    line_left = read_sensor_lin(left_line_sensor); 
+    // int ajuste = ajuste_sumonado(sensor_left, sensor_right, sensor_front);
+
     estado = get_state(sensor_left, sensor_right, sensor_front, line_left, line_right, rotate_start_time);
 
 
@@ -71,18 +71,24 @@ void loop(){
     Serial.print("Sensor_right: ");
     Serial.print(sensor_right); 
     Serial.print(" \n");
-    
       
     switch (estado)
     {
       case search:
+        Serial.println("PARA FRENTE");
+        set_speed(-255, 255);
         procurar();
 
       case rotate:
+        Serial.println("RODANDO");
         rotacionar();
         rotate_start_time = millis();
-      case attack:
-        atacar(ajuste);
+
+
+      // case attack:
+      //   Serial.println("ATACAR");
+      //   set_speed(-255, 255);
+        //atacar(ajuste);
 
       break;
       default: procurar();
@@ -90,16 +96,13 @@ void loop(){
   }
 
   
-else if (comando == 2){
+else if (comando == IR_BUTTON3){
   set_speed(0, 0);
   }
 }
 
 void pisca_pisca(){
-  if (c < 20){
   digitalWrite(LED_TESTE, HIGH);
   delay(10);
   digitalWrite(LED_TESTE, LOW);
-  c++;
-  }
 }

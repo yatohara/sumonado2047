@@ -1,6 +1,6 @@
 #include "machine_state.h"
 #include "setup_motores.h"
-#define DIST 100
+#define DIST 125
 
 
 
@@ -51,13 +51,11 @@ int ajuste_sumonado(double left_sensor, double right_sensor, double front_sensor
 
 
 void rotacionar(){
-    set_speed(-255, 255);
-    //set_speed_drv(-1, 1);
+    set_speed(255, 255);
 }
 
 void procurar(){
-    set_speed(255, 255);
-    //set_speed_drv(1, 1);
+    set_speed(-255, 255);
 }
 
 void atacar(int valor_ajustado){
@@ -70,6 +68,6 @@ void atacar(int valor_ajustado){
     else{
         set_speed(255, 255);
     } */
-    set_speed(255, 255);
+    // set_speed(-255, 255);
 
 }

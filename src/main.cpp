@@ -1,103 +1,83 @@
-// Marcus esteve por aqui
-#include "config.h"
-#include "setup_motores.h"
-#include "machine_state.h"
-#include "setup_sensores.h"
-#include <IRremote.h>
 #include <Wire.h>
+#include <VL53L0X.h>
+#include <Arduino.h>
+#include <IRremote.h>
 
-#define IR_BUTTON1 0
-#define IR_BUTTON2 1
-#define IR_BUTTON3 2  
+#include "motors/motors.h"
 
-double sensor_front, sensor_right, sensor_left;
-int line_right, line_left;
-int ajuste; 
-long rotate_start_time = 0;
-long global_time = 0, rtime;
-int comando;
+VL53L0X sensor;
+Motors motors;
 
+#define ledTeste 4
+#define IR_RECEIVE_PIN 36
 
-states estado;
-void pisca_pisca();
+bool running = false;
+unsigned long startTime = 0;
+bool direcao = false;
 
-void setup(){
-  Serial.begin(SERIAL_RATE);
-  Wire.begin(SDA, SCL);
-  IrReceiver.begin(IRRECEPTOR);
+void setup() {
+  Serial.begin(9600);
+  Wire.begin();
 
-  global_time = millis();
-  pinMode(LED_TESTE, OUTPUT);
-  digitalWrite(LED_TESTE, LOW);
-  setup_sensor();
-  setup_motor();
+  sensor.setTimeout(500);
+  if (!sensor.init()) {
+    Serial.println("Failed to detect and initialize sensor!");
+    while (1) {}
   }
+  sensor.startContinuous();
+  motors.setup();
 
-// para teste do código
-void loop(){
-  rtime = millis();
+  pinMode(ledTeste, OUTPUT);
+  digitalWrite(ledTeste, LOW);
 
-  if (IrReceiver.decode()){
-    IrReceiver.resume();
-    comando = IrReceiver.decodedIRData.command;
-    Serial.print(comando);
-    pisca_pisca();
-  }
-
-  else if (comando == IR_BUTTON2){
-    Serial.println("START");
-    pisca_pisca();
-    // sensor_front = read_front_sensor();
-    // sensor_right = read_right_sensor();
-    // sensor_left = read_left_sensor();
-    line_right = read_sensor_lin(right_line_sensor);
-    line_left = read_sensor_lin(left_line_sensor); 
-    // int ajuste = ajuste_sumonado(sensor_left, sensor_right, sensor_front);
-
-    estado = get_state(sensor_left, sensor_right, sensor_front, line_left, line_right, rotate_start_time);
-
-
-    Serial.print("Sensor_front: ");
-    Serial.print(sensor_front);
-    Serial.print(" ");
-    Serial.print("Sensor_left: ");
-    Serial.print(sensor_left);
-    Serial.print(" ");
-    Serial.print("Sensor_right: ");
-    Serial.print(sensor_right); 
-    Serial.print(" \n");
-      
-    switch (estado)
-    {
-      case search:
-        Serial.println("PARA FRENTE");
-        set_speed(-255, 255);
-        procurar();
-
-      case rotate:
-        Serial.println("RODANDO");
-        rotacionar();
-        rotate_start_time = millis();
-
-
-      // case attack:
-      //   Serial.println("ATACAR");
-      //   set_speed(-255, 255);
-        //atacar(ajuste);
-
-      break;
-      default: procurar();
-      } 
-  }
-
-  
-else if (comando == IR_BUTTON3){
-  set_speed(0, 0);
-  }
+  IrReceiver.begin(IR_RECEIVE_PIN);
 }
 
-void pisca_pisca(){
-  digitalWrite(LED_TESTE, HIGH);
-  delay(30);
-  digitalWrite(LED_TESTE, LOW);
+void readControl() {
+    if (IrReceiver.decode()){
+        IrReceiver.resume();
+        int command = IrReceiver.decodedIRData.command;
+        Serial.print(command);
+        digitalWrite(ledTeste, HIGH);
+        delay(20);
+        digitalWrite(ledTeste, LOW);
+        if (command == 1) {
+            startTime = millis();
+            running = true;
+        } else if (command == 2) running = false;     
+    }
+}
+
+void loop(){
+    if (running) {
+        unsigned long relativeTime = millis() - startTime;
+        Serial.println(sensor.readRangeContinuousMillimeters());
+        if (sensor.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
+
+        if (sensor.readRangeContinuousMillimeters() < 400) {
+            Serial.println("ATACAR");
+            motors.write(255, 240);
+            delay(200);
+            if (sensor.readRangeContinuousMillimeters() < 250) {
+                while (sensor.readRangeContinuousMillimeters() < 250) {
+                    motors.write(255, 255);
+                    readControl();
+                    if (!running) return;
+                }
+            } else direcao = !direcao;
+        } else {
+            if (relativeTime <250) {
+                Serial.println("FRENTE");
+                motors.write(255, 255);
+            } else {
+                Serial.println("GIRAR");
+                if (direcao) motors.write(-150, 150);
+                else motors.write(150, -150);
+            }
+        }
+    } else {
+        motors.write(0, 0);
+    }
+
+    readControl();
 }

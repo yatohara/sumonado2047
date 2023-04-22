@@ -5,16 +5,8 @@
 
 #include "motors/motors.h"
 
-<<<<<<< HEAD
-double sensor_front;
-int line_right, line_left;
-long rotate_start_time = 0;
-long global_time = 0, rtime;
-int comando;
-=======
 VL53L0X sensor;
 Motors motors;
->>>>>>> 2295f6fbe8cb07cfe0b7dcdc2e95441d9182b07f
 
 #define ledTeste 4
 #define IR_RECEIVE_PIN 36
@@ -35,69 +27,10 @@ void setup() {
   sensor.startContinuous();
   motors.setup();
 
-<<<<<<< HEAD
-// para teste do código
-void loop(){
-  rtime = millis() - global_time;
-
-  if (IrReceiver.decode()){
-    IrReceiver.resume();
-
-    comando = IrReceiver.decodedIRData.command;
-    Serial.print(comando);
-  }
-
-    
-  if ((comando == IR_BUTTON1)){
-    pisca_pisca();
-  }
-
-  else if (comando == IR_BUTTON2){
-    Serial.println("START");
-    pisca_pisca();
-    // sensor_front = read_front_sensor();
-    // sensor_right = read_right_sensor();
-    // sensor_left = read_left_sensor();
-    line_right = read_sensor_lin(right_line_sensor);
-    line_left = read_sensor_lin(left_line_sensor); 
-    // int ajuste = ajuste_sumonado(sensor_left, sensor_right, sensor_front);
-
-    estado = get_state(sensor_front, line_left, line_right, rtime);
-
-
-    Serial.print("Sensor_front: ");
-    Serial.println(sensor_front);
-
-      
-    switch (estado)
-    {
-      case search:
-        Serial.println("PARA FRENTE");
-        procurar();
-
-      case rotate:
-        Serial.println("RODANDO");
-        rotacionar();
-
-      case attack:
-        Serial.println("ATACAR");
-        atacar();
-
-      break;
-      default: procurar();
-      } 
-  }
-
-  
-else if (comando == IR_BUTTON3){
-  set_speed(0, 0);
-  }
-=======
   pinMode(ledTeste, OUTPUT);
   digitalWrite(ledTeste, LOW);
 
   IrReceiver.begin(IR_RECEIVE_PIN);
->>>>>>> 2295f6fbe8cb07cfe0b7dcdc2e95441d9182b07f
 }
 
 void readControl() {

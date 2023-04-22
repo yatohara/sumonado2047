@@ -4,11 +4,7 @@
 
 // A LOGICA DO TCRT É INVERTIDA, QUANDO DETECTA ALGO RETORNA 0 E QUANDO NÃO RETORNA 1
 
-VL53L0X sensor1;
-VL53L0X sensor2;
-VL53L0X sensor3;
-
-
+VL53L0X sensor;
 
 // Adafruit_VL53L0X sensor1 = Adafruit_VL53L0X();
 // Adafruit_VL53L0X sensor2 = Adafruit_VL53L0X();
@@ -25,35 +21,39 @@ VL53L0X sensor3;
 
 void init_sensor_lin(int sensor_pin); // inicializa o sensor de linha
 void setup_sensor();  // inicializa todos os sensores
-void setID();  // adiciona os endereços aos sensores VL 
+// void setID();  // adiciona os endereços aos sensores VL 
 int read_sensor_lin(int sensor_pin); // realiza a leitura dos sensores de linha
 double read_front_sensor();  // retorna a leitura do VL do centro
-double read_right_sensor();  // retorna a leitura do VL direito
-double read_left_sensor();  // retorna a leitura do VL esquerdo
+// double read_right_sensor();  // retorna a leitura do VL direito
+// double read_left_sensor();  // retorna a leitura do VL esquerdo
 
 
-void setID() {
-  // all reset
-  // all unreset
 
-  pinMode(SENSOR1_SHT_PIN, INPUT);
-  sensor1.init(true);
-  sensor1.setAddress(SENSOR1_ADDRESS);
-  delay(20);
 
-  pinMode(SENSOR2_SHT_PIN, INPUT);
-  sensor2.init(true);
-  sensor2.setAddress(SENSOR2_ADDRESS);
-  delay(20);
 
-  pinMode(SENSOR3_SHT_PIN, INPUT);
-  sensor3.init(true);
-  sensor3.setAddress(SENSOR3_ADDRESS);
-  delay(20);
 
-  sensor1.setTimeout(100);
-  sensor2.setTimeout(100);
-  sensor3.setTimeout(100);
+// void setID() {
+//   // all reset
+//   // all unreset
+
+//   pinMode(SENSOR1_SHT_PIN, INPUT);
+//   sensor1.init(true);
+//   sensor1.setAddress(SENSOR1_ADDRESS);
+//   delay(20);
+
+//   pinMode(SENSOR2_SHT_PIN, INPUT);
+//   sensor2.init(true);
+//   sensor2.setAddress(SENSOR2_ADDRESS);
+//   delay(20);
+
+//   pinMode(SENSOR3_SHT_PIN, INPUT);
+//   sensor3.init(true);
+//   sensor3.setAddress(SENSOR3_ADDRESS);
+//   delay(20);
+
+//   sensor1.setTimeout(100);
+//   sensor2.setTimeout(100);
+//   sensor3.setTimeout(100);
 
 //   digitalWrite(SENSOR1_SHT_PIN, HIGH);
 //   digitalWrite(SENSOR2_SHT_PIN, HIGH);
@@ -93,10 +93,10 @@ void setID() {
 //     Serial.println(F("Failed to boot third VL53L0X"));
 //     while(1);
 //   }  
-}
+// }
 
 double read_front_sensor() {
-  return sensor1.readRangeSingleMillimeters();
+  return sensor.readRangeContinuousMillimeters();
   // int leitura1;
   // sensor1.rangingTest(&sensor1_data, false); // pass in 'true' to get debug data printout!
   // Serial.println("FRONT VL");
@@ -110,35 +110,35 @@ double read_front_sensor() {
   // }
 }
 
-double read_right_sensor() {
-  return sensor2.readRangeSingleMillimeters();
-  // int leitura2;
-  // sensor2.rangingTest(&sensor2_data, false); // pass in 'true' to get debug data printout!
-  // Serial.print(F("RIGHT VL: "));
-  // if(sensor2_data.RangeStatus != 4) {     // if not out of range
-  //   leitura2 = sensor2_data.RangeMilliMeter;
-  //   Serial.print(sensor2_data.RangeMilliMeter);
-  //   return leitura2;
-  // } else {
-  //   Serial.print(F("Out of range"));
-  //   return 0; 
-  // }
-}
+// double read_right_sensor() {
+//   return sensor2.readRangeSingleMillimeters();
+//   // int leitura2;
+//   // sensor2.rangingTest(&sensor2_data, false); // pass in 'true' to get debug data printout!
+//   // Serial.print(F("RIGHT VL: "));
+//   // if(sensor2_data.RangeStatus != 4) {     // if not out of range
+//   //   leitura2 = sensor2_data.RangeMilliMeter;
+//   //   Serial.print(sensor2_data.RangeMilliMeter);
+//   //   return leitura2;
+//   // } else {
+//   //   Serial.print(F("Out of range"));
+//   //   return 0; 
+//   // }
+// }
 
-double read_left_sensor() {
-  return sensor3.readRangeSingleMillimeters();
-  // int leitura3;
-  // sensor3.rangingTest(&sensor3_data, false); // pass in 'true' to get debug data printout!
-  // Serial.print(F("LEFT VL: "));
-  // if(sensor3_data.RangeStatus != 4) {     // if not out of range
-  //   leitura3 = sensor3_data.RangeMilliMeter;
-  //   Serial.print(sensor3_data.RangeMilliMeter);
-  //   return leitura3; 
-  // } else {
-  //   Serial.print(F("Out of range"));
-  //   return 0;
-  // }
-}
+// double read_left_sensor() {
+//   return sensor3.readRangeSingleMillimeters();
+//   // int leitura3;
+//   // sensor3.rangingTest(&sensor3_data, false); // pass in 'true' to get debug data printout!
+//   // Serial.print(F("LEFT VL: "));
+//   // if(sensor3_data.RangeStatus != 4) {     // if not out of range
+//   //   leitura3 = sensor3_data.RangeMilliMeter;
+//   //   Serial.print(sensor3_data.RangeMilliMeter);
+//   //   return leitura3; 
+//   // } else {
+//   //   Serial.print(F("Out of range"));
+//   //   return 0;
+//   // }
+// }
 
 void init_sensor_lin(int sensor_pin){
   pinMode(sensor_pin, INPUT); 
@@ -151,22 +151,31 @@ int read_sensor_lin(int sensor_pin){
 
 
 void setup_sensor(){
-  pinMode(SENSOR1_SHT_PIN, OUTPUT);
-  pinMode(SENSOR2_SHT_PIN, OUTPUT);
-  pinMode(SENSOR3_SHT_PIN, OUTPUT);
+  // pinMode(SENSOR1_SHT_PIN, OUTPUT);
+  // pinMode(SENSOR2_SHT_PIN, OUTPUT);
+  // pinMode(SENSOR3_SHT_PIN, OUTPUT);
   pinMode(right_line_sensor, INPUT);
   pinMode(left_line_sensor, INPUT);
 
-  Serial.println(F("Shutdown pins inited..."));
+  // Serial.println(F("Shutdown pins inited..."));
 
-  digitalWrite(SENSOR1_SHT_PIN, LOW);
-  digitalWrite(SENSOR2_SHT_PIN, LOW);
-  digitalWrite(SENSOR3_SHT_PIN, LOW);
+  // digitalWrite(SENSOR1_SHT_PIN, LOW);
+  // digitalWrite(SENSOR2_SHT_PIN, LOW);
+  // digitalWrite(SENSOR3_SHT_PIN, LOW);
+
+
+  sensor.setTimeout(100);
+  if (!sensor.init())
+  {
+    Serial.println("Failed to detect and initialize sensor!");
+    while (1) {}
+  }
+  sensor.startContinuous();
 
   
   Serial.println(F("Both in reset mode...(pins are low)"));
   Serial.println(F("Starting..."));
-  setID();
+  // setID();
   init_sensor_lin(right_line_sensor);
   init_sensor_lin(left_line_sensor);
   }

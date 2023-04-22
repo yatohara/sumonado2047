@@ -10,9 +10,8 @@
 #define IR_BUTTON2 1
 #define IR_BUTTON3 2  
 
-double sensor_front, sensor_right, sensor_left;
+double sensor_front;
 int line_right, line_left;
-int ajuste; 
 long rotate_start_time = 0;
 long global_time = 0, rtime;
 int comando;
@@ -35,7 +34,7 @@ void setup(){
 
 // para teste do código
 void loop(){
-  rtime = millis();
+  rtime = millis() - global_time;
 
   if (IrReceiver.decode()){
     IrReceiver.resume();
@@ -59,36 +58,26 @@ void loop(){
     line_left = read_sensor_lin(left_line_sensor); 
     // int ajuste = ajuste_sumonado(sensor_left, sensor_right, sensor_front);
 
-    estado = get_state(sensor_left, sensor_right, sensor_front, line_left, line_right, rotate_start_time);
+    estado = get_state(sensor_front, line_left, line_right, rtime);
 
 
     Serial.print("Sensor_front: ");
-    Serial.print(sensor_front);
-    Serial.print(" ");
-    Serial.print("Sensor_left: ");
-    Serial.print(sensor_left);
-    Serial.print(" ");
-    Serial.print("Sensor_right: ");
-    Serial.print(sensor_right); 
-    Serial.print(" \n");
+    Serial.println(sensor_front);
+
       
     switch (estado)
     {
       case search:
         Serial.println("PARA FRENTE");
-        set_speed(-255, 255);
         procurar();
 
       case rotate:
         Serial.println("RODANDO");
         rotacionar();
-        rotate_start_time = millis();
 
-
-      // case attack:
-      //   Serial.println("ATACAR");
-      //   set_speed(-255, 255);
-        //atacar(ajuste);
+      case attack:
+        Serial.println("ATACAR");
+        atacar();
 
       break;
       default: procurar();

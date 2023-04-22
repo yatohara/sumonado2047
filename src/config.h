@@ -32,8 +32,8 @@
 #define SENSOR2_SHT_PIN 19
 #define SENSOR3_SHT_PIN 18
 
-
 // TCRT
+
 #define right_line_sensor 23
 #define left_line_sensor 15
 

@@ -39,13 +39,8 @@ void loop(){
 
   if (IrReceiver.decode()){
     IrReceiver.resume();
-
     comando = IrReceiver.decodedIRData.command;
     Serial.print(comando);
-  }
-
-    
-  if ((comando == IR_BUTTON1)){
     pisca_pisca();
   }
 
@@ -103,6 +98,6 @@ else if (comando == IR_BUTTON3){
 
 void pisca_pisca(){
   digitalWrite(LED_TESTE, HIGH);
-  delay(10);
+  delay(30);
   digitalWrite(LED_TESTE, LOW);
 }
